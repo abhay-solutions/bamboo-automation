@@ -57,8 +57,8 @@ public class PlanSpec {
     public final String DEPLOYMENTPLANNAME = PROJECTNAME + " - " + PLANNAME;
     public final String LINKED_REPOSITORY_NAME = "Hello-world";
 
-    public final String ADMINNAME = "Abhay";
-    public final String NOTIFICATIONEMAIL = "abhgu40@in.ibm.com";
+    public final String ADMINNAME = "admin";
+    public final String NOTIFICATIONEMAIL = "email id ";
 
     public final boolean ENABLE_BITBUCKET_SSH_KEY = false;
     public final boolean ENABLE_RSYNC_SSH_KEY = false;
@@ -91,7 +91,7 @@ public class PlanSpec {
 
     PlanPermissions createPlanPermission(PlanIdentifier planIdentifier) {
         Permissions permission = new Permissions()
-                .userPermissions("abhaygupta", PermissionType.ADMIN, PermissionType.CLONE, PermissionType.EDIT)
+                .userPermissions("username", PermissionType.ADMIN, PermissionType.CLONE, PermissionType.EDIT)
                 .groupPermissions("bamboo-admin", PermissionType.ADMIN)
                 .loggedInUserPermissions(PermissionType.VIEW)
                 .anonymousUserPermissionView();
@@ -159,11 +159,11 @@ public class PlanSpec {
 					                 .executableLabel("Maven-3.0.1"),
                                 new DockerBuildImageTask()
 		                               .description("build")
-		                               .imageName("abhayibm/hello-world:0.0.1")
+		                               .imageName("dockerImage")
 		                               .dockerfileInWorkingDir(),   
 	                            new DockerPushImageTask()
-	                                   .dockerHubImage("abhayibm/hello-world:0.0.1")
-	                                   .authentication("abhayibm", "abhay@1995"), 
+	                                   .dockerHubImage("dockerImage")
+	                                   .authentication("UserName", "password"), 
 	                            new ScriptTask()
 	                                   .description("Any Script")
 	                                   .interpreterShell()
