@@ -114,7 +114,7 @@ public class PlanSpec {
             URL url = new URL(gitEndpoint);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
-            String userCredentials = "abhgu40:f9e213c93c3c6b4ecec6e229f749dcbd4092a820";
+            String userCredentials = "abhgu40:GitToken";
             String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
             conn.setRequestProperty ("Authorization", basicAuth);
             conn.setRequestMethod("POST");
