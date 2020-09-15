@@ -1,19 +1,7 @@
 package com;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.StringTokenizer;
-
-import org.json.simple.JSONObject;
+import java.nio.charset.Charset;
 
 import com.atlassian.bamboo.specs.api.BambooSpec;
 import com.atlassian.bamboo.specs.api.builders.BambooKey;
@@ -53,7 +41,6 @@ import com.atlassian.bamboo.specs.builders.trigger.RemoteTrigger;
 import com.atlassian.bamboo.specs.model.task.ScriptTaskProperties;
 import com.atlassian.bamboo.specs.util.BambooServer;
 import com.atlassian.bamboo.specs.util.MapBuilder;
-import com.google.common.base.Splitter;
 
 /**
  * Plan configuration for Bamboo.
@@ -81,96 +68,25 @@ public class PlanSpec {
 
     public static final int NUMBER_OF_STAGES = 1;
     public final String RSYNC_ENCRYPTED_PRIVATE_SSH_KEY = "";
-    static ArrayList<String> gitDetailsList=new ArrayList<String>();
+
 
     /**
      * Run main to publish plan on Bamboo
      */
     public static void main(final String[] args) throws Exception {
         //By default credentials are read from the '.credentials' file.
-    	
-    	
-    	//////
-        try {
-        	String giturl = "https://github.ibm.com/DIP-TEST/ucd-check2.git";
-        	StringTokenizer multiTokenizer = new StringTokenizer(giturl, "/");
-        	
-      
-        	
-        	while (multiTokenizer.hasMoreTokens())
-        	{
-        		
-        	   gitDetailsList.add(multiTokenizer.nextToken());
-        	    
-        	}
-        	
-        	String gitHostName = gitDetailsList.get(0)+"//"+gitDetailsList.get(1);
-        	String gitOrgName = gitDetailsList.get(2);
-        	String gitRepoName = gitDetailsList.get(3).replace(".git", "");
-        	System.out.println("gitHostname: "+gitHostName);
-        	System.out.println("gitOrgName: "+gitOrgName);
-        	System.out.println("gitRepoName: " + gitRepoName);
-        	String gitEndpoint = gitHostName+"/api/v3/orgs/"+gitOrgName+"/repos ";
-            URL url = new URL(gitEndpoint);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            String userCredentials = "abhgu40:f9e213c93c3c6b4ecec6e229f749dcbd4092a820";
-            String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-            conn.setRequestProperty ("Authorization", basicAuth);
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            JSONObject obj = new JSONObject();
-        	obj.put("name",gitRepoName);
-        	obj.put("private", "true");
-        	System.out.println("Json used "+obj);
-            //String input = "{\"name\":\"test-repo-cli123\", \"private\":\"true\"}";
-            OutputStream os = conn.getOutputStream();
-            os.write(obj.toString().getBytes());
-            os.flush();
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-                System.out.println("Failed : HTTP error code : "
-                        + conn.getResponseCode());
-                InputStream errorStream = conn.getErrorStream();
-                try(BufferedReader br = new BufferedReader(new InputStreamReader(errorStream))) {
-                    String errString = "";
-                    String errOutput = "";
-                    while((errString = br.readLine()) != null) {
-                        errOutput += errString+"\n";
-                    }
-                    System.out.println("Error Message =======>\n ");
-                    System.out.println(errOutput);
-                }
-            } else {
-                InputStream serverOutput = conn.getInputStream();
-                try (BufferedReader br = new BufferedReader(new InputStreamReader((serverOutput)))) {
-                    String output;
-                    System.out.println("Output from Server .... \n");
-                    while ((output = br.readLine()) != null) {
-                        System.out.println(output);
-                    }
-                }
-            }
-            conn.disconnect();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
- 
-    
-    	
-//        BambooServer bambooServer = new BambooServer("http://localhost:8085");
-//
-//        Plan plan = new PlanSpec().createPlan();
-//
-//        bambooServer.publish(plan);
-//
-//        PlanPermissions planPermission = new PlanSpec().createPlanPermission(plan.getIdentifier());
-//
-//        bambooServer.publish(planPermission);
-//        
-//        Deployment deployment = new PlanSpec().createDeployment();
-//        bambooServer.publish(deployment);
+        BambooServer bambooServer = new BambooServer("http://localhost:8085");
+
+        Plan plan = new PlanSpec().createPlan();
+
+        bambooServer.publish(plan);
+
+        PlanPermissions planPermission = new PlanSpec().createPlanPermission(plan.getIdentifier());
+
+        bambooServer.publish(planPermission);
+        
+        Deployment deployment = new PlanSpec().createDeployment();
+        bambooServer.publish(deployment);
     }
 
     PlanPermissions createPlanPermission(PlanIdentifier planIdentifier) {
